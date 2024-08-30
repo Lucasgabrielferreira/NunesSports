@@ -5,9 +5,7 @@ using NunesSports.Models;
 
 namespace NunesSports.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProdutosController : ControllerBase
+    public class ProdutosController : Controller
     {
         private readonly NunesSportsContext _context;
 
@@ -16,16 +14,14 @@ namespace NunesSports.Controllers
             _context = context;
         }
 
-        // GET: api/Produtos
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Produto>>> GetProdutos()
+        // GET: /Produtos
+        public async Task<IActionResult> Index()
         {
-            return await _context.Produtos.ToListAsync();
+            return View(await _context.Produtos.ToListAsync());
         }
 
-        // GET: api/Produtos/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Produto>> GetProduto(int id)
+        // GET: /Produtos/Details/5
+        public async Task<IActionResult> Details(int id)
         {
             var produto = await _context.Produtos.FindAsync(id);
 
@@ -34,12 +30,19 @@ namespace NunesSports.Controllers
                 return NotFound();
             }
 
-            return produto;
+            return View(produto);
         }
 
-        // POST: api/Produtos
+        // GET: /Produtos/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: /Produtos/Create
         [HttpPost]
-        public async Task<IActionResult> PostProduto([FromForm] Produto produto, IFormFile imagem)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([FromForm] Produto produto, IFormFile imagem)
         {
             if (imagem != null)
             {
@@ -51,30 +54,65 @@ namespace NunesSports.Controllers
                 produto.ImagemUrl = "/images/" + imagem.FileName;
             }
 
-            _context.Produtos.Add(produto);
-            await _context.SaveChangesAsync();
+            if (ModelState.IsValid)
+            {
+                _context.Add(produto);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
 
-            return RedirectToAction("Index");
+            return View(produto);
         }
 
-        // PUT: api/Produtos/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduto(int id, Produto produto)
+        // GET: /Produtos/Edit/5
+        public async Task<IActionResult> Edit(int id)
+        {
+            var produto = await _context.Produtos.FindAsync(id);
+
+            if (produto == null)
+            {
+                return NotFound();
+            }
+
+            return View(produto);
+        }
+
+        // POST: /Produtos/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nome,Preco,ImagemUrl")] Produto produto)
         {
             if (id != produto.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(produto).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(produto);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Produtos.Any(e => e.Id == id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
 
-            return NoContent();
+            return View(produto);
         }
 
-        // DELETE: api/Produtos/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduto(int id)
+        // GET: /Produtos/Delete/5
+        public async Task<IActionResult> Delete(int id)
         {
             var produto = await _context.Produtos.FindAsync(id);
             if (produto == null)
@@ -82,10 +120,18 @@ namespace NunesSports.Controllers
                 return NotFound();
             }
 
+            return View(produto);
+        }
+
+        // POST: /Produtos/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var produto = await _context.Produtos.FindAsync(id);
             _context.Produtos.Remove(produto);
             await _context.SaveChangesAsync();
-
-            return NoContent();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

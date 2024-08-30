@@ -1,0 +1,32 @@
+﻿@model IEnumerable<NunesSports.Models.Produto>
+
+<h2>Produtos</h2>
+<a asp-action="Create" class="btn btn-primary">Adicionar Produto</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Código</th>
+            <th>Descrição</th>
+            <th>Preço</th>
+            <th>Imagem</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var produto in Model)
+        {
+            <tr>
+                <td>@produto.Nome</td>
+                <td>@produto.Codigo</td>
+                <td>@produto.Descricao</td>
+                <td>@produto.Preco.ToString("C")</td>
+                <td><img src="@produto.ImagemUrl" alt="Imagem do Produto" width="100" /></td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@produto.Id" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@produto.Id" class="btn btn-danger btn-sm">Deletar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

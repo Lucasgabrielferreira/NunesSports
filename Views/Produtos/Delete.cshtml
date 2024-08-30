@@ -1,0 +1,18 @@
+﻿@model NunesSports.Models.Produto
+
+<h2>Deletar Produto</h2>
+
+<div>
+    <h3>Tem certeza que deseja deletar este produto?</h3>
+    <h4>@Model.Nome</h4>
+    <p><strong>Código:</strong> @Model.Codigo</p>
+    <p><strong>Descrição:</strong> @Model.Descricao</p>
+    <p><strong>Preço:</strong> @Model.Preco.ToString("C")</p>
+    <p><strong>Imagem:</strong><br><img src="@Model.ImagemUrl" alt="Imagem do Produto" width="100" /></p>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Deletar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
