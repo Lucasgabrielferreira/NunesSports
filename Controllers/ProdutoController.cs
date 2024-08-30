@@ -39,12 +39,22 @@ namespace NunesSports.Controllers
 
         // POST: api/Produtos
         [HttpPost]
-        public async Task<ActionResult<Produto>> PostProduto(Produto produto)
+        public async Task<IActionResult> PostProduto([FromForm] Produto produto, IFormFile imagem)
         {
+            if (imagem != null)
+            {
+                var filePath = Path.Combine("wwwroot/images", imagem.FileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imagem.CopyToAsync(stream);
+                }
+                produto.ImagemUrl = "/images/" + imagem.FileName;
+            }
+
             _context.Produtos.Add(produto);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetProduto), new { id = produto.Id }, produto);
+            return RedirectToAction("Index");
         }
 
         // PUT: api/Produtos/5
